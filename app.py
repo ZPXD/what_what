@@ -2,12 +2,10 @@ from flask import Flask, render_template
 
 app=Flask(__name__)
 
+
 @app.route('/', methods=["GET", "POST"])
 def index():
-    return "<h1> style=center>what what</h1>" #render_template("index.html")
-
-# Widok dla zalogowanego użytkownika. ['logout']
-# Widok dla wylogowanego użytkownika. ['login' / 'signup']
+    return render_template("index.html")
 
 @app.route('/login', methods=["GET", "POST"])
 def login():
