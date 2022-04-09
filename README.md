@@ -49,5 +49,3 @@ ssh -L 5000:localhost:80 -i nazwa_klucza username@1.1.1.1
 ```
 
 I wejdź na http://127.0.0.1:5000/
-
-#### 
