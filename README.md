@@ -3,7 +3,7 @@
 
 ## Jak uruchomić:
 
-Będąc na przygotowanym serwerze albo u siebie na komputerze.
+Będąc na przygotowanym serwerze albo u siebie na przygotowanym komputerze (przygotowanym czyli masz git, python3, pip3, venv, ssh).
 
 #### Pobierz:
 
