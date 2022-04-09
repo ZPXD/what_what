@@ -42,10 +42,10 @@ Po odpaleniu aplikacji wejdź na http://127.0.0.1:5000/
 Otwórz nowy terminal lub powershell będąc na swoim komputerze i wpisz:
 
 za username -  wstaw nazwę użytkownika
-za nazwa_klucza - nazwę klucza
+za ścieżka_do_nazwy_klucza - nazwę klucza oraz ścieżkę do niego, np. C:\Users\jakub\.ssh\klucz_xd
 za 1.1.1.1 – ip serwera
 ```
-ssh -L 5000:localhost:80 -i nazwa_klucza username@1.1.1.1
+ssh -L 5000:localhost:80 -i ścieżka_do_nazwy_klucza username@1.1.1.1
 ```
 
 I wejdź na http://127.0.0.1:5000/
