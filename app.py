@@ -9,6 +9,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
+from flask_login import LoginManager
+from flask_login import login_required, current_user, login_user, logout_user
+
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/xd.db'
@@ -16,6 +19,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.secret_key = ':)'
 
 db = SQLAlchemy(app)
+login_manager = LoginManager(app)
 
 # Main
 
@@ -46,6 +50,11 @@ def index():
 
 # Login
 
+@login_manager.user_loader
+def load_user(user_id):
+    user = User.query.get(user_id)
+    return user
+
 @app.route('/login', methods=["GET", "POST"])
 def login():
     form = LoginForm()
@@ -56,9 +65,11 @@ def login():
         user = User.query.filter_by(email=email).first()
         if user:
             if user.check_password(password):
+                login_user(user, force=True)
                 return redirect( url_for('index'))
         else:
             return "user not found"
+
     return render_template("login.html", form=form)
 
 @app.route('/signup', methods=["GET", "POST"])
@@ -81,13 +92,24 @@ def signup():
         return redirect( url_for('index'))
     return render_template("signup.html", form=form)
 
+@login_required
 @app.route('/logout')
 def logout():
+    logout_user()
     return render_template("logout.html")
 
-@app.route('/signup_success', methods=["GET", "POST"])
-def signup_success():
-	return render_template("signup_success.html")
+@login_required
+@app.route('/secret')
+def secret():
+    return "elooo"
+
+@login_required
+@app.route('/profile/<name>')
+def user(name):
+    if name == current_user.name:
+        return "ok"
+    else:
+        return "no"
 
 
 # DB Models
