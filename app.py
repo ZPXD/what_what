@@ -3,6 +3,7 @@ from flask import Flask, render_template
 from flask_wtf import FlaskForm
 from flask_wtf import FlaskForm, RecaptchaField
 from wtforms import StringField, TextAreaField, SubmitField, PasswordField, DateField, SelectField
+from wtforms.validators import DataRequired
 
 app = Flask(__name__)
 
@@ -11,29 +12,29 @@ app.secret_key = ':)'
 
 # Main
 
-@app.route('/', methods=["GET", "POST"])
+@app.route('/')
 def index():
-	return render_template("index.html")
+ 	return render_template("index.html")
 
-@app.route('/ask_question', methods=["GET", "POST"])
-def question():
-	return "question"
+# @app.route('/ask_question', methods=["GET", "POST"])
+# def question():
+# 	return "question"
 
-@app.route('/answer', methods=["GET", "POST"])
-def answer():
-	return "answer"
+# @app.route('/answer', methods=["GET", "POST"])
+# def answer():
+# 	return "answer"
 
-@app.route('/', methods=["GET", "POST"])
-def list_of_questions():
-	return "list of questions"
+# @app.route('/', methods=["GET", "POST"])
+# def list_of_questions():
+# 	return "list of questions"
 
-@app.route('/', methods=["GET", "POST"])
-def show_random_answer():
-	return "random answer"
+# @app.route('/', methods=["GET", "POST"])
+# def show_random_answer():
+# 	return "random answer"
 
-@app.route('/', methods=["GET", "POST"])
-def show_list_of_answers():
-	return "list of answers"
+# @app.route('/', methods=["GET", "POST"])
+# def show_list_of_answers():
+# 	return "list of answers"
 
 
 # Login
@@ -64,12 +65,17 @@ def signup_success():
 
 # Forms
 
+class LoginForm(FlaskForm):
+    email = StringField('email', validators=[DataRequired()])
+    password = StringField('hasło', validators=[DataRequired()])
+    submit = SubmitField('zaloguj się')
+
 class SignupForm(FlaskForm):
-	user = StringField('Login')
-	password = PasswordField('Password')
-	confirm_password = PasswordField('Repeat Password')
-	email = StringField('Email')
-	submit = SubmitField('Submit')
+    name = StringField('nazwa użytkownika', validators=[DataRequired()])
+    email = StringField('email', validators=[DataRequired()])
+    password = StringField('hasło', validators=[DataRequired()])
+    password2 = StringField('powtórz hasło', validators=[DataRequired()])
+    submit = SubmitField('załóż konto')
 
 
 # Errors
