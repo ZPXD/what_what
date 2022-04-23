@@ -6,7 +6,7 @@ from wtforms import StringField, TextAreaField, SubmitField, PasswordField, Date
 
 app = Flask(__name__)
 
-app.secret_key = 'super secret key'
+app.secret_key = ':)'
 
 
 # Main
@@ -70,6 +70,17 @@ class SignupForm(FlaskForm):
 	confirm_password = PasswordField('Repeat Password')
 	email = StringField('Email')
 	submit = SubmitField('Submit')
+
+
+# Errors
+
+@app.errorhandler(404)
+def handle_404(e):
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def handle_500(e):
+    return render_template('500.html'), 500
 
 
 if __name__=="__main__":
