@@ -101,11 +101,6 @@ def logout():
     return render_template("logout.html")
 
 @login_required
-@app.route('/secret')
-def secret():
-    return "elooo"
-
-@login_required
 @app.route('/profile/<name>')
 def user(name):
     if name == current_user.name:
