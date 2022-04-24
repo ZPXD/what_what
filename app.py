@@ -21,6 +21,7 @@ app.secret_key = ':)'
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 
+
 # Main
 
 @app.route('/')
@@ -161,4 +162,4 @@ def handle_500(e):
 
 
 if __name__=="__main__":
-	app.run(host='0.0.0.0')
+	app.run(debug=True)
