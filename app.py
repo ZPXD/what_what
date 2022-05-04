@@ -12,10 +12,14 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager
 from flask_login import login_required, current_user, login_user, logout_user
 
+import os
+
+
+here = os.getcwd()
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/xd.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///{}/db/xd.db'.format(here)
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.secret_key = ':)'
 
@@ -128,6 +132,8 @@ class User(UserMixin, db.Model):
 
 @app.before_first_request
 def create_all():
+	if not 'db' in os.listdir():
+		os.mkdir('db')	
 	db.create_all()
 
 
