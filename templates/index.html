@@ -1,7 +1,21 @@
 {% extends "base.html" %}
 
 {% block content %}
+
     <br>
-   	<p>what what</p>
+    <br>
+    <p>What What</p>
+    <br>
+    <h1 style="text-align:center">x</h1>
+    {% for question in questions %}
+
+        <div>
+            <p><b>{{ question.question }}</b></p>
+            <p>{{ question.author }}</p>
+        </div>
+
+    {% endfor %}
+    <br>
+    <br>
 
 {% endblock %}

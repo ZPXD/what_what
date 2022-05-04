@@ -3,22 +3,28 @@
 {% block content %}
 
     <br>
-    <p>Login</p>
+
+    <br>
+    <br>
+    <p>Ask Question.</p>
 
     <div class="form-wrapper">
         <form style="text-align:center" action="" method="post">
         
             {{ form.csrf_token() }}
+   
+            <br>
+            <br>
             
-            {{ form.email.label() }}
-            {{ form.email }}
+            <p><b>Question</b></p>
+            {{ form.question }}
 
-            {{ form.password.label() }}
-            {{ form.password }}
+            <br>
+            <br>
             
             {{ form.button }}
 
         </form>
     </div>
-
+    
 {% endblock %}

@@ -13,6 +13,7 @@ from flask_login import LoginManager
 from flask_login import login_required, current_user, login_user, logout_user
 
 import os
+from datetime import datetime
 
 
 here = os.getcwd()
@@ -33,25 +34,134 @@ login_manager = LoginManager(app)
 def index():
 	return render_template("index.html")
 
-# @app.route('/ask_question', methods=["GET", "POST"])
-# def question(): 
-# 	return "question"
 
-# @app.route('/answer', methods=["GET", "POST"])
-# def answer():
-# 	return "answer"
+# Main
 
-# @app.route('/', methods=["GET", "POST"])
-# def list_of_questions():
-# 	return "list of questions"
+@app.route('/')
+def index():
+	'''
+	Questions list.
+	'''
+	#questions = Question.query.all()[:10]
+	questions = Question.query.filter(Question.question.contains('s'))
+	search = SearchQuestionForm()
+	if search.validate_on_submit():
+ 		search = search.search.data
 
-# @app.route('/', methods=["GET", "POST"])
-# def show_random_answer():
-# 	return "random answer"
+	return render_template("index.html", questions=questions)
 
-# @app.route('/', methods=["GET", "POST"])
-# def show_list_of_answers():
-# 	return "list of answers"
+def search_question():
+	search = SearchQuestionForm()
+	if search.validate_on_submit():
+ 		search = search.search.data
+
+ 		results = Question.query.filter_by('')
+
+
+
+@app.route('/question', methods=["GET", "POST"])
+def ask_question(): 
+	'''
+	Question form.
+	'''
+	form = QuestionForm()
+	if form.validate_on_submit():
+		date = time_now()
+		question = form.question.data
+		question = Question(question=question, date=date)
+		db.session.add(question)
+		db.session.commit()
+		db.session.flush()
+		return redirect(url_for("question", question_id=str(question.id)))
+	return render_template('ask_question.html', form=form)
+
+@app.route('/<int:question_id>', methods=["GET", "POST"])
+def question(question_id): 
+	'''
+	List of question answers and question menu.
+	'''
+	question = Question.query.filter_by(id=int(question_id)).first()
+	button = AnswerButton()
+	if button.validate_on_submit():
+		return redirect(url_for("answer_question", question_id=str(question_id)))
+
+	question_answers = QuestionAnswers.query.filter_by(question_id=int(question_id)).all()
+	return render_template('question.html', button=button, question=question, question_answers=question_answers)
+
+@app.route('/<int:question_id>/answer', methods=["GET", "POST"])
+def answer_question(question_id):
+	'''
+	Answer question.
+	'''
+	if current_user.is_authenticated:
+		author = current_user.name
+	else:
+		author = 'whoops'
+
+	form = QuestionAnswerForm()
+	if form.validate_on_submit():
+		question_id = int(question_id)
+		date = time_now()
+		answer_1 = form.answer_1.data
+		answer_2 = form.answer_2.data
+		answer_3 = form.answer_3.data
+		answer_4 = form.answer_4.data
+		answer_5 = form.answer_5.data
+		answers = [answer_1, answer_2, answer_3, answer_4, answer_5]
+		for i, answer in enumerate(answers):
+			if answer == '':
+				continue
+
+			question_answer = QuestionAnswers(author=author, question_id=question_id, answer=answer, answer_n=i, date=date)	
+			db.session.add(question_answer)
+			db.session.commit()
+
+		what_else = form.what_else.data
+		what_else_answers = WhatElseAnswers(author=author, question_id=question_id, what_else=what_else, date=date)
+		db.session.add(what_else_answers)
+		db.session.commit()
+
+		return redirect(url_for("question", question_id=str(question_id)))
+	return render_template('answer_question.html', form=form)
+
+@app.route('/<int:question_id>/<int:n>', methods=["GET", "POST"])
+def question_answers_random(question_id, n):
+	'''
+	Question answers - random N.
+	'''
+	answers_list = [] # Questions.query.filter_by(x=x).all()
+	return render_template('question_answers_random.html', questions_list=questions_list)
+
+@app.route('/<int:question_id>/t/<int:n>', methods=["GET", "POST"])
+def question_answers_random_top(question_id, n):
+	'''
+	Question answers - top random N.
+	'''
+	answers_list = [] # Questions.query.filter_by(x=x).all()
+	return render_template('question_answers_random_top.html', questions_list=questions_list)
+
+
+@app.route('/<int:question_id>/<owner>', methods=["GET", "POST"])
+def question_decks(question_id, owner):
+	'''
+	Question list.
+	'''
+
+	decks_list = [] # Decks.query.filter_by(x=x).all()
+	return render_template('question_decks.html', decks_list=decks_list)
+
+@app.route('/<int:question_id>/<owner>/<int:deck_id>', methods=["GET", "POST"])
+def question_deck(question_id, owner, deck_id):
+	'''
+	Question deck.
+	'''
+	questions = [] # Questions.query.filter_by(x=x).all()
+	return render_template('question_deck.html', questions=questions)
+
+# Helpers
+
+def time_now():
+	return datetime.now()
 
 
 # Login
@@ -69,6 +179,10 @@ def login():
 		password = form.password.data
 
 		user = User.query.filter_by(email=email).first()
+		user.last_login = time_now()
+		db.session.add(user)
+		db.session.commit()
+
 		if user:
 			if user.check_password(password):
 				login_user(user, force=True)
@@ -82,6 +196,9 @@ def login():
 def signup():
 	form = SignupForm()
 	if form.validate_on_submit():
+
+		join_date = time_now()
+		last_login = time_now()
 		name = form.name.data
 		email = form.email.data
 		password = form.password.data
@@ -90,7 +207,7 @@ def signup():
 		if User.query.filter_by(email=email).first():
 			return 'taki email już istnieje'
 
-		user = User(name=name, email=email, password=password)
+		user = User(name=name, email=email, password=password, join_date=join_date, last_login=last_login)
 		user.set_password(password)
 		db.session.add(user)
 		db.session.commit()
@@ -117,9 +234,11 @@ def user(name):
 
 class User(UserMixin, db.Model):
 	id = db.Column(db.Integer, primary_key=True)
-	name = db.Column(db.String(80), unique=True, nullable=False)
-	email = db.Column(db.String(120), unique=True, nullable=False)
-	password = db.Column(db.String(120), unique=True, nullable=False)
+	join_date = db.Column(db.DateTime)
+	last_login = db.Column(db.DateTime)
+	name = db.Column(db.String(120), unique=True)
+	email = db.Column(db.String(120), unique=True)
+	password = db.Column(db.String(120))
 
 	def set_password(self,password):
 		self.password = generate_password_hash(password)
@@ -130,26 +249,68 @@ class User(UserMixin, db.Model):
 	def __repr__(self):
 		return '<User {}>'.format(self.name)
 
+class Question(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	date = db.Column(db.DateTime)
+	question = db.Column(db.String(303))
+
+class QuestionAnswers(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	date = db.Column(db.DateTime)
+	question_id = db.Column(db.Integer)
+	author = db.Column(db.String(120)) 
+	answer = db.Column(db.String(120))
+	answer_n = db.Column(db.Integer)
+
+class WhatElseAnswers(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	date = db.Column(db.DateTime)
+	question_id = db.Column(db.Integer)
+	author = db.Column(db.String(120))
+	what_else = db.Column(db.String(120))
+	
+
+
+# Forms
+
+class AnswerButton(FlaskForm):
+	button = SubmitField('Answer')
+
+class SearchQuestion(FlaskForm):
+	search = SubmitField()
+	button = SubmitField('Search')
+
+class QuestionForm(FlaskForm):
+	question = StringField(validators=[DataRequired()])
+	button = SubmitField('Ask')
+
+class QuestionAnswerForm(FlaskForm):
+	answer_1 = StringField(validators=[DataRequired()])
+	answer_2 = StringField()
+	answer_3 = StringField()
+	answer_4 = StringField()
+	answer_5 = StringField()
+	what_else = StringField()
+	button = SubmitField('Answer')
+
+class LoginForm(FlaskForm):
+	email = StringField(validators=[DataRequired()])
+	password = StringField(validators=[DataRequired()])
+	button = SubmitField('login')
+
+class SignupForm(FlaskForm):
+	name = StringField(validators=[DataRequired()])
+	email = StringField(validators=[DataRequired()])
+	password = StringField(validators=[DataRequired()])
+	confirm_password = StringField(validators=[DataRequired()])
+	button = SubmitField('sign up')
+
+
 @app.before_first_request
 def create_all():
 	if not 'db' in os.listdir():
 		os.mkdir('db')	
 	db.create_all()
-
-
-# Forms
-
-class LoginForm(FlaskForm):
-	email = StringField('email', validators=[DataRequired()])
-	password = StringField('hasło', validators=[DataRequired()])
-	submit = SubmitField('zaloguj się')
-
-class SignupForm(FlaskForm):
-	name = StringField('nazwa użytkownika', validators=[DataRequired()])
-	email = StringField('email', validators=[DataRequired()])
-	password = StringField('hasło', validators=[DataRequired()])
-	confirm_password = StringField('powtórz hasło', validators=[DataRequired()])
-	submit = SubmitField('załóż konto')
 
 
 # Errors

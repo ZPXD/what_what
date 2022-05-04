@@ -13,27 +13,21 @@
         
             {{ form.csrf_token() }}
 
-            <p>
-            {{ form.name.label() }}
+            <p><b>What is your name?</b></p>
             {{ form.name }}
             </p>
 
-            <p>
-            {{ form.password.label() }}
+            <p><b>Password (DNRY)</b></p>
             {{ form.password }}
-            </p>
 
-            <p>
-            {{ form.confirm_password.label() }}
+            <p><b>Re:</b></p>
             {{ form.confirm_password }}
-            </p>
 
-            <p>
-            {{ form.email.label() }}
+            <p><b>Email:</b></p>
             {{ form.email }}
-            </p>
-            
-            {{ form.submit }}
+
+            <p><b>Email:</b></p>
+            {{ form.button }}
 
         </form>
     </div>
