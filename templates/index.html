@@ -10,7 +10,7 @@
 
     <div class="form-wrapper" style="text-align:center">
         <form action="" method="post">
-            </p>{{ form.csrf_token() }} {{ form.search }} {{ form.button }}</p>
+            </p>{{ form.csrf_token() }} {{ form.search(placeholder="search phrase") }} {{ form.author(size=10, placeholder="author") }}  {{ form.button }}</p>
         </form>
     </div>
 

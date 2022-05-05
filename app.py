@@ -44,7 +44,11 @@ def index():
 	form = SearchQuestionForm()
 	if form.validate_on_submit():
 		search = form.search.data
-		questions = Question.query.filter(Question.question.contains(search))
+		author = form.author.data
+		questions = Question.query.filter(
+			Question.question.contains(search),
+			Question.author.contains(author)
+		)
 		if not questions:
 			questions = []
 	return render_template("index.html", form=form, questions=questions)
@@ -299,6 +303,7 @@ class ReoladPageButton(FlaskForm):
 
 class SearchQuestionForm(FlaskForm):
 	search = StringField()
+	author = StringField()
 	button = SubmitField('Search')
 
 class QuestionForm(FlaskForm):
