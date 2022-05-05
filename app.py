@@ -34,23 +34,22 @@ login_manager = LoginManager(app)
 @app.route('/', methods=["GET", "POST"])
 def index():
 	'''
-	Questions list.
+	Questions list and main page.
 	'''
 
-	questions = Question.query.all()
-	if questions:
-		questions = questions[:10]
+	# Questions.
+	questions = Question.query.all()[:10]
 
+	# Search.
 	form = SearchQuestionForm()
 	if form.validate_on_submit():
 		search = form.search.data
-		author = form.author.data
+		author = form.search.data
 		questions = Question.query.filter(
 			Question.question.contains(search),
-			Question.author.contains(author)
-		)
-		if not questions:
-			questions = []
+			Question.author.contains(search)
+		)[:10]
+
 	return render_template("index.html", form=form, questions=questions)
 
 @app.route('/question', methods=["GET", "POST"])
@@ -241,13 +240,29 @@ def logout():
 	logout_user()
 	return render_template("logout.html")
 
+
 @login_required
-@app.route('/profile/<name>')
-def user(name):
-	if name == current_user.name:
-		return "ok"
-	else:
+@app.route('/profile/<name>', methods=["GET", "POST"])
+def user_profile(name):
+	'''
+	User profile.
+	'''
+	if name != current_user.name:
 		return "no"
+
+	# User questions.
+	questions = Question.query.filter(Question.author.contains(name))[:10]
+
+	# User questions search.
+	form = SearchQuestionForm()
+	if form.validate_on_submit():
+		search = form.search.data
+		questions = Question.query.filter(
+			Question.question.contains(search),
+			Question.author.contains(name)
+		)[:10]
+
+	return render_template("index.html", form=form, questions=questions)
 
 
 # DB Models

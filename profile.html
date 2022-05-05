@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+    <!-- QUESTION ANSWERS -->
+
+    <div style="text-align:center">
+        <br>
+        <br>
+        <br>
+        {% for answer in question_answers %} 
+
+            <div>
+                <p>{{answer.answer}} - {{answer.author}}</p>
+            </div>
+        
+        {% endfor %}
+        <br>
+        <br>
+        <br>
+    </div>
+
+
+    <!-- DECKS -->
+    
+	<!--
+    <div>
+        <br>
+        <p><b><a href="{{ url_for('question', question_id=question.id )  }}" class="navbar-item">back to question.</a></b></p>
+        <br>
+    </div>
+	-->
+
+
+    <!-- QUESTIONS -->
+    
+    <div>
+		{% for question in questions %}
+        <p><b><a href="{{ url_for('question', question_id=question.id )  }}" class="navbar-item">back to question.</a></b></p>
+        <br>
+    </div>
+
+
+{% endblock %}
