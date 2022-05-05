@@ -1,10 +1,8 @@
 <div class="navbar-end">
     <a href="{{ url_for('index') }}" class="navbar-item">Home</a>
-
     <a href="{{ url_for('ask_question') }}" class="navbar-item">Ask Question</a>
 
     {% if current_user.is_authenticated %}
-        <a href="{{ url_for('index') }}" class="navbar-item">Home</a>
         <a href="{{ url_for('logout') }}" class="navbar-item">Logout</a>
         User: {{ current_user.name }}
     {% else %}

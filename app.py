@@ -30,45 +30,40 @@ login_manager = LoginManager(app)
 
 # Main
 
-@app.route('/')
-def index():
-	return render_template("index.html")
-
-
-# Main
-
-@app.route('/')
+@app.route('/', methods=["GET", "POST"])
 def index():
 	'''
 	Questions list.
 	'''
-	#questions = Question.query.all()[:10]
-	questions = Question.query.filter(Question.question.contains('s'))
-	search = SearchQuestionForm()
-	if search.validate_on_submit():
- 		search = search.search.data
 
-	return render_template("index.html", questions=questions)
+	questions = Question.query.all()
+	if questions:
+		questions = questions[:10]
 
-def search_question():
-	search = SearchQuestionForm()
-	if search.validate_on_submit():
- 		search = search.search.data
-
- 		results = Question.query.filter_by('')
-
-
+	form = SearchQuestionForm()
+	if form.validate_on_submit():
+		search = form.search.data
+		questions = Question.query.filter(Question.question.contains(search))
+		if not questions:
+			questions = []
+	return render_template("index.html", form=form, questions=questions)
 
 @app.route('/question', methods=["GET", "POST"])
 def ask_question(): 
 	'''
 	Question form.
 	'''
+
+	if current_user.is_authenticated:
+		author = current_user.name
+	else:
+		author = 'whoops'
+
 	form = QuestionForm()
 	if form.validate_on_submit():
 		date = time_now()
 		question = form.question.data
-		question = Question(question=question, date=date)
+		question = Question(question=question, date=date, author=author)
 		db.session.add(question)
 		db.session.commit()
 		db.session.flush()
@@ -252,6 +247,7 @@ class User(UserMixin, db.Model):
 class Question(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	date = db.Column(db.DateTime)
+	author = db.Column(db.String(303))
 	question = db.Column(db.String(303))
 
 class QuestionAnswers(db.Model):
@@ -276,8 +272,8 @@ class WhatElseAnswers(db.Model):
 class AnswerButton(FlaskForm):
 	button = SubmitField('Answer')
 
-class SearchQuestion(FlaskForm):
-	search = SubmitField()
+class SearchQuestionForm(FlaskForm):
+	search = StringField()
 	button = SubmitField('Search')
 
 class QuestionForm(FlaskForm):

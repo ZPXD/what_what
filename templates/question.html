@@ -2,31 +2,45 @@
 
 {% block content %}
 
-    <br>
 
-    <br>
-    <br>
-    <p>Question.</p>
-    <br>
-    <br>
-    <p>{{questions}}</p>
-    <br>
-    <br>
+    <!-- QUESTION -->
+    
+    <div>
+        <br>
+        <br>
+        <p>Question.</p>
+        <br>
+        <br>
+        <p><b>{{question.question}}</b></p>
+        <br>
+        <br>
+        <br>
+    </div>
+
+
+    <!-- ANSWER QUESTION -->
+    
     <div class="form-wrapper" style="text-align:center">
         <form action="" method="post">
             {{ button.csrf_token() }}
             {{ button.button }}
         </form>
+        <br>
+        <br>
     </div>
-    <br>
-    <br>
-    {% for answer in question_answers %}
-        <br>
-        <p>{{answer.author}}</p>
-        <p>{{answer.answer}}</p>
-        <p>{{answer.date}}</p>
-        <br>
-    {% endfor %}
+
+
+    <!-- QUESTION ANSWERS -->
+
+    <div>
+        {% for answer in question_answers %}
+
+            <div>
+                <p>{{answer.answer}} - {{answer.author}}</p>
+            </div>
+        
+        {% endfor %}
+    </div>
 
 
 {% endblock %}
