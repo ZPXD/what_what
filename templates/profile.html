@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+	<div style="text-align:center">
+		<br>
+		<br>
+		<p>What What</p>
+		<br>	
+    </div>
+
+
+    <!-- SEARCH USER QUESTIONS -->
+
+    <div class="form-wrapper" style="text-align:center">
+		<form action="" method="post">
+			</p>{{ form.csrf_token() }} {{ form.search(placeholder="search phrase") }}  {{ form.button }}</p>
+		</form>
+		<br>
+		<br>
+		<br>
+	</div>
+
+
+    <!-- USER QUESTIONS -->
+
+    <div>
+        <br>
+        <br>
+        <br>
+        {% for question in questions %} 
+			<div>
+				<p><b><a href="{{ url_for('question', question_id =question.id )  }}" class="question">{{question.question}}</a></b> - {{question.author}}</p>
+			</div>
+        {% endfor %}
+        <br>
+        <br>
+        <br>
+    </div>
+
+
+    <!-- DECKS -->
+    
+	{#
+    <div>
+        <br>
+        <p><b><a href="{{ url_for('question', question_id=question.id )  }}" class="navbar-item">back to question.</a></b></p>
+        <br>
+    </div>
+	#}
+
+
+{% endblock %}

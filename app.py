@@ -47,8 +47,11 @@ def index():
 		author = form.search.data
 		questions = Question.query.filter(
 			Question.question.contains(search),
-			Question.author.contains(search)
+			Question.author.contains(author)
 		)[:10]
+	
+	# Sort questions by date (newest to oldest).
+	questions.sort(key=lambda q : q.date, reverse=True)
 
 	return render_template("index.html", form=form, questions=questions)
 
@@ -79,12 +82,19 @@ def question(question_id):
 	'''
 	List of question answers and question menu.
 	'''
+
+	# Question.
 	question = Question.query.filter_by(id=int(question_id)).first()
+	
+	# Answer button.
 	button = AnswerButton()
 	if button.validate_on_submit():
 		return redirect(url_for("answer_question", question_id=str(question_id)))
 
+	# Question Answers.
 	question_answers = QuestionAnswers.query.filter_by(question_id=int(question_id)).all()
+	question_answers.sort(key=lambda q : q.date, reverse=True)
+
 	return render_template('question.html', button=button, question=question, question_answers=question_answers, n_answers=1)
 
 @app.route('/<int:question_id>/<int:n_answers>', methods=["GET", "POST"])
@@ -97,6 +107,8 @@ def show_n_answers(question_id, n_answers=1):
 			question_answers = random.sample(all_question_answers, n_answers)
 		except:
 			question_answers = random.sample(all_question_answers, 1)
+		question_answers.sort(key=lambda q : q.date, reverse=True)
+
 	else:
 		return "no answers yet"
 	button = ReoladPageButton(n_answers=n_answers)
@@ -262,7 +274,10 @@ def user_profile(name):
 			Question.author.contains(name)
 		)[:10]
 
-	return render_template("index.html", form=form, questions=questions)
+	# Sort questions by date (newest to oldest).
+	questions.sort(key=lambda q : q.date, reverse=True)
+
+	return render_template("profile.html", form=form, questions=questions)
 
 
 # DB Models
