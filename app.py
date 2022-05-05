@@ -13,6 +13,7 @@ from flask_login import LoginManager
 from flask_login import login_required, current_user, login_user, logout_user
 
 import os
+import random
 from datetime import datetime
 
 
@@ -81,7 +82,27 @@ def question(question_id):
 		return redirect(url_for("answer_question", question_id=str(question_id)))
 
 	question_answers = QuestionAnswers.query.filter_by(question_id=int(question_id)).all()
-	return render_template('question.html', button=button, question=question, question_answers=question_answers)
+	return render_template('question.html', button=button, question=question, question_answers=question_answers, n_answers=1)
+
+@app.route('/<int:question_id>/<int:n_answers>', methods=["GET", "POST"])
+def show_n_answers(question_id, n_answers=1): 
+	print(type(n_answers))
+	question = Question.query.filter_by(id=question_id).first()
+	all_question_answers = QuestionAnswers.query.filter_by(question_id=question_id).all()
+	if all_question_answers:
+		try:
+			question_answers = random.sample(all_question_answers, n_answers)
+		except:
+			question_answers = random.sample(all_question_answers, 1)
+	else:
+		return "no answers yet"
+	button = ReoladPageButton(n_answers=n_answers)
+	if button.validate_on_submit():
+		n_answers = int(button.n_answers.data) # recode
+		if not n_answers or n_answers > len(all_question_answers) or n_answers < 1:
+			n_answers = 1
+		return redirect( url_for('show_n_answers', question_id=int(question_id), n_answers=n_answers))
+	return render_template('show_n_answers.html', button=button, question=question, question_answers=question_answers, n_answers=int(n_answers))
 
 @app.route('/<int:question_id>/answer', methods=["GET", "POST"])
 def answer_question(question_id):
@@ -271,6 +292,10 @@ class WhatElseAnswers(db.Model):
 
 class AnswerButton(FlaskForm):
 	button = SubmitField('Answer')
+
+class ReoladPageButton(FlaskForm):
+	n_answers = StringField(default=1)
+	button = SubmitField('Next answer')
 
 class SearchQuestionForm(FlaskForm):
 	search = StringField()

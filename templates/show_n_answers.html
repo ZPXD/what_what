@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+    <!-- QUESTION ANSWERS -->
+
+    <div style="text-align:center">
+        <br>
+        <br>
+        <br>
+        {% for answer in question_answers %} 
+
+            <div>
+                <p>{{answer.answer}} - {{answer.author}}</p>
+            </div>
+        
+        {% endfor %}
+        <br>
+        <br>
+        <br>
+    </div>
+
+
+    <!-- NEXT ANSWER(S) -->
+    
+    <div class="form-wrapper" style="text-align:center">
+        <form action="" method="post">
+            {{ button.csrf_token() }}
+            <p>{{button.n_answers(size=1)}} {{ button.button }}</p>
+        </form>
+        <br>
+        <br>
+		<p><b>for now lets keep it CTR+R. Speed reasons.</b></p>
+    </div>
+
+
+    <!-- QUESTION -->
+    
+    <div>
+        <br>
+        <p><b><a href="{{ url_for('question', question_id=question.id )  }}" class="navbar-item">back to question.</a></b></p>
+        <br>
+    </div>
+
+
+{% endblock %}
